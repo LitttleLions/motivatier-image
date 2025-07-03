@@ -5,10 +5,8 @@ class ImageStorageApp {
         this.currentPath = '';
         this.selectedFiles = [];
         this.language = 'de'; // Default to German
-        // Dynamic base path detection
-        this.basePath = document.querySelector('base')?.href || 
-                       window.location.pathname.replace(/\/[^\/]*$/, '') || 
-                       '';
+        // Dynamic base path detection - configure for subdirectory deployment
+        this.basePath = '/motivatier-image';
         this.translations = {
             de: {
                 home: 'Home',
@@ -387,7 +385,7 @@ class ImageStorageApp {
         this.showLoading(true);
         
         try {
-            const response = await fetch(`/api/list?path=${encodeURIComponent(path)}`);
+            const response = await fetch(`${this.basePath}/api/list?path=${encodeURIComponent(path)}`);
             const data = await response.json();
             
             if (!response.ok) {
@@ -417,7 +415,7 @@ class ImageStorageApp {
 
     async createFolderByPath(path) {
         try {
-            const response = await fetch('/api/folder', {
+            const response = await fetch(`${this.basePath}/api/folder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -447,7 +445,7 @@ class ImageStorageApp {
         }
         
         try {
-            const response = await fetch('/api/folder', {
+            const response = await fetch(`${this.basePath}/api/folder`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -489,7 +487,7 @@ class ImageStorageApp {
 
     async renameFolderByPath(oldPath, newPath) {
         try {
-            const response = await fetch('/api/folder/rename', {
+            const response = await fetch(`${this.basePath}/api/folder/rename`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -537,7 +535,7 @@ class ImageStorageApp {
         const allFolders = [];
         
         try {
-            const response = await fetch(`/api/list?path=${encodeURIComponent(path)}`);
+            const response = await fetch(`${this.basePath}/api/list?path=${encodeURIComponent(path)}`);
             const data = await response.json();
             
             if (!response.ok) {
@@ -900,7 +898,7 @@ class ImageStorageApp {
                     formData.append('folder', selectedFolder);
                 }
                 
-                const response = await fetch('/api/upload', {
+                const response = await fetch(`${this.basePath}/api/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -1003,7 +1001,7 @@ class ImageStorageApp {
         createBtn.disabled = true;
         
         try {
-            const response = await fetch('/api/folder', {
+            const response = await fetch(`${this.basePath}/api/folder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
