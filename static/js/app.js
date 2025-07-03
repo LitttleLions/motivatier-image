@@ -386,12 +386,19 @@ class ImageStorageApp {
 
         try {
             const response = await fetch(`${this.basePath}/api/list?path=${encodeURIComponent(path)}`);
-            const data = await response.json();
-
+            
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to load folder');
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                throw new Error('Server returned non-JSON response');
+            }
+
+            const data = await response.json();
             this.renderFiles(data);
             this.updateBreadcrumb(path);
             this.updateCurrentFolderDisplay(path);
@@ -548,12 +555,19 @@ class ImageStorageApp {
 
         try {
             const response = await fetch(`${this.basePath}/api/list?path=${encodeURIComponent(path)}`);
-            const data = await response.json();
-
+            
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to load folder');
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                throw new Error('Server returned non-JSON response');
+            }
+
+            const data = await response.json();
             const folders = data.filter(f => f.type === 'directory');
 
             for (const folder of folders) {
@@ -838,6 +852,10 @@ class ImageStorageApp {
             const fullPath = parentPath ? `${parentPath}/${folderName.trim()}` : folderName.trim();
             this.createFolderByPath(fullPath);
         }
+    }
+
+    addSubfolder() {
+        this.addSubfolderAtPath(this.currentPath);
     }
 
     addSubfolder() {

@@ -23,13 +23,8 @@ def create_app():
 
     # Dynamic base path support for subdirectory deployment
     base_path = os.environ.get('APPLICATION_ROOT', '/motivatier-image').rstrip('/')
-    if base_path:
-        app.config['APPLICATION_ROOT'] = base_path
+    app.config['APPLICATION_ROOT'] = base_path
 
-    # Create required directories
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-    # Register blueprints with dynamic prefix
     from blueprints.api import api_bp
     from blueprints.ui import ui_bp
 
@@ -40,6 +35,17 @@ def create_app():
     # Register blueprints with subdirectory prefixes
     app.register_blueprint(api_bp, url_prefix=api_prefix)
     app.register_blueprint(ui_bp, url_prefix=ui_prefix)
+
+    # Debug: Print registered routes
+    print("Registered routes:")
+    for rule in app.url_map.iter_rules():
+        print(f"  {rule.rule} -> {rule.endpoint}")
+
+    # Add a catch-all route for debugging
+    @app.route('/<path:path>')
+    def catch_all(path):
+        print(f"Catch-all route accessed: {path}")
+        return f"Path not found: {path}", 404
 
     return app
 

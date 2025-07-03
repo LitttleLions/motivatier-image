@@ -55,19 +55,24 @@ def upload_file():
 def list_files():
     try:
         path = request.args.get('path', '').strip()
+        logger.info(f"API /list called with path: '{path}'")
         
         # Security check
         if '..' in path or path.startswith('/'):
+            logger.warning(f"Invalid path attempted: '{path}'")
             return jsonify({'error': 'Invalid path'}), 400
 
         # Build full path
         base_path = current_app.config['UPLOAD_FOLDER']
         full_path = os.path.join(base_path, path) if path else base_path
+        logger.info(f"Full path: '{full_path}'")
 
         if not os.path.exists(full_path):
+            logger.info(f"Path does not exist: '{full_path}'")
             return jsonify([]), 200
 
         if not os.path.isdir(full_path):
+            logger.warning(f"Path is not a directory: '{full_path}'")
             return jsonify({'error': 'Path is not a directory'}), 400
 
         files = []
