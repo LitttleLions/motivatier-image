@@ -844,6 +844,15 @@ class ImageStorageApp {
         this.addSubfolderAtPath(this.currentPath);
     }
 
+    // Method was missing - add it back
+    addSubfolderAtPath(parentPath) {
+        const folderName = prompt(this.t('enterFolderName'));
+        if (folderName && folderName.trim()) {
+            const fullPath = parentPath ? `${parentPath}/${folderName.trim()}` : folderName.trim();
+            this.createFolderByPath(fullPath);
+        }
+    }
+
     updateBreadcrumb(path) {
         const breadcrumb = document.getElementById('breadcrumb');
         let html = '<li class="breadcrumb-item"><a href="#" onclick="app.loadFolder(\'\')">Home</a></li>';

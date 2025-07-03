@@ -12,21 +12,18 @@ def index():
 def serve_image(filename):
     """Serve uploaded images"""
     try:
-        # Security check - prevent directory traversal
+        # Security check to prevent directory traversal
         if '..' in filename or filename.startswith('/'):
+            abort(403)
+
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        file_path = os.path.join(upload_folder, filename)
+
+        # Check if file exists and is within upload folder
+        if not os.path.exists(file_path) or not os.path.commonpath([upload_folder, file_path]) == upload_folder:
             abort(404)
 
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-
-        # Check if file exists
-        if not os.path.exists(file_path):
-            abort(404)
-
-        # Get directory and filename
-        directory = os.path.dirname(file_path)
-        basename = os.path.basename(file_path)
-
-        return send_from_directory(directory, basename)
-
-    except Exception:
+        return send_from_directory(upload_folder, filename)
+    except Exception as e:
+        current_app.logger.error(f"Error serving image {filename}: {e}")
         abort(404)
