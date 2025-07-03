@@ -6,7 +6,13 @@ class ImageStorageApp {
         this.selectedFiles = [];
         this.language = 'de'; // Default to German
         // Dynamic base path detection - configure for subdirectory deployment
-        this.basePath = window.location.pathname.includes('/motivatier-image') ? '/motivatier-image' : '';
+        if (window.location.pathname.includes('/motivatier-image') || 
+            window.location.href.includes('/motivatier-image') ||
+            document.querySelector('script[src*="/motivatier-image/"]')) {
+            this.basePath = '/motivatier-image';
+        } else {
+            this.basePath = '';
+        }
         this.translations = {
             de: {
                 home: 'Home',
