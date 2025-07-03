@@ -79,3 +79,42 @@ def create_folder():
     except Exception as e:
         logger.error(f"Folder creation error: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
+
+@api_bp.route('/folder', methods=['DELETE'])
+def delete_folder():
+    """Delete a folder"""
+    try:
+        data = request.get_json()
+        if not data or 'path' not in data:
+            return jsonify({'error': 'Path is required'}), 400
+        
+        path = data['path']
+        StorageService.delete_folder(path)
+        
+        return jsonify({'success': True}), 200
+        
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Folder deletion error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@api_bp.route('/folder/rename', methods=['POST'])
+def rename_folder():
+    """Rename a folder"""
+    try:
+        data = request.get_json()
+        if not data or 'oldPath' not in data or 'newPath' not in data:
+            return jsonify({'error': 'Old path and new path are required'}), 400
+        
+        old_path = data['oldPath']
+        new_path = data['newPath']
+        StorageService.rename_folder(old_path, new_path)
+        
+        return jsonify({'success': True}), 200
+        
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Folder rename error: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500

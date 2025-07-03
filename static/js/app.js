@@ -831,11 +831,6 @@ class ImageStorageApp {
     addSubfolder() {
         this.addSubfolderAtPath(this.currentPath);
     }
-    
-    // Fix the error by ensuring the method exists
-    addSubfolderToCurrentPath() {
-        this.addSubfolderAtPath(this.currentPath);
-    }
 
     updateBreadcrumb(path) {
         const breadcrumb = document.getElementById('breadcrumb');
