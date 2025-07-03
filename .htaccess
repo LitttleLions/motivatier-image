@@ -1,0 +1,33 @@
+
+# Image Storage Service - Apache Configuration
+
+# CGI aktivieren
+Options +ExecCGI
+AddHandler cgi-script .cgi
+
+# Haupt-Weiterleitung
+DirectoryIndex index.html cgi-bin/index.cgi
+
+# Direkte Bild-URLs
+RewriteEngine On
+RewriteRule ^images/(.+)$ images/$1 [L]
+
+# Upload-Größe
+LimitRequestBody 10485760
+
+# Security Headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options SAMEORIGIN
+Header always set X-XSS-Protection "1; mode=block"
+
+# Cache für Bilder
+<FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 30 days"
+    Header set Cache-Control "public, immutable"
+</FilesMatch>
+
+# CGI-Fehler ausblenden
+<Files "*.cgi">
+    ErrorDocument 500 "Service temporär nicht verfügbar"
+</Files>
