@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Python-Abhängigkeiten kopieren und installieren
-COPY pyproject.toml .
+COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir Flask==3.1.* Werkzeug>=3.1 python-dotenv>=1.1 Pillow>=11.3 gunicorn>=23.0 email-validator>=2.2
+RUN pip install --no-cache-dir -r requirements.txt
 
 # App-Code kopieren
 COPY . .

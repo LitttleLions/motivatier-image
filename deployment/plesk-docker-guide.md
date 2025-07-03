@@ -24,8 +24,8 @@ git clone https://github.com/LitttleLions/motivatier-image.git .
 
 ```bash
 # Im Container
-pip install --no-cache-dir -r pyproject.toml
-pip install Flask==3.1.* Werkzeug>=3.1 python-dotenv>=1.1 Pillow>=11.3 gunicorn>=23.0
+pip install --no-cache-dir --upgrade pip
+pip install --no-cache-dir -r requirements.txt
 ```
 
 ### Schritt 3: Verzeichnisse erstellen
