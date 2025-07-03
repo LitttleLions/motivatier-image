@@ -6,13 +6,8 @@ class ImageStorageApp {
         this.selectedFiles = [];
         this.language = 'de'; // Default to German
         // Dynamic base path detection - configure for subdirectory deployment
-        if (window.location.pathname.includes('/motivatier-image') || 
-            window.location.href.includes('/motivatier-image') ||
-            document.querySelector('script[src*="/motivatier-image/"]')) {
-            this.basePath = '/motivatier-image';
-        } else {
-            this.basePath = '';
-        }
+        // Force /motivatier-image for production deployment
+        this.basePath = '/motivatier-image';
         this.translations = {
             de: {
                 home: 'Home',
@@ -113,7 +108,7 @@ class ImageStorageApp {
         document.getElementById('refreshTree').addEventListener('click', () => this.loadFolderTree());
 
         // Tree action buttons
-        document.getElementById('addSubfolderBtn').addEventListener('click', () => this.addSubfolder());
+        document.getElementById('addSubfolderBtn').addEventListener('click', () => this.addSubfolderAtPath(this.currentPath));
         document.getElementById('refreshTreeBtn').addEventListener('click', () => this.loadFolderTree());
 
         // Toggle custom folder input
@@ -868,9 +863,7 @@ class ImageStorageApp {
         }
     }
 
-    addSubfolder() {
-        this.addSubfolderAtPath(this.currentPath);
-    }
+    
 
     updateBreadcrumb(path) {
         const breadcrumb = document.getElementById('breadcrumb');
