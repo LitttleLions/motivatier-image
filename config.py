@@ -9,6 +9,9 @@ class Config:
     MAX_SIZE_MB = int(os.getenv('MAX_SIZE_MB', '10'))
     ALLOWED_TYPES = os.getenv('ALLOWED_TYPES', 'image/jpeg,image/png,image/gif,image/webp').split(',')
     
+    # Dynamic application root for subdirectory deployments
+    APPLICATION_ROOT = os.getenv('APPLICATION_ROOT', '')
+    
     # CGI-optimierte Pfade
     if os.getenv('CGI_MODE') or 'cgi-bin' in os.getcwd():
         # CGI-Modus: Relative Pfade vom Document Root
@@ -25,3 +28,7 @@ class Config:
     
     MAX_CONTENT_LENGTH = MAX_SIZE_MB * 1024 * 1024
     THUMBNAIL_SIZE = (150, 150)
+    
+    # Server configuration
+    PREFERRED_URL_SCHEME = os.getenv('PREFERRED_URL_SCHEME', 'https')
+    SERVER_NAME = os.getenv('SERVER_NAME')

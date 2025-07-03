@@ -5,6 +5,10 @@ class ImageStorageApp {
         this.currentPath = '';
         this.selectedFiles = [];
         this.language = 'de'; // Default to German
+        // Dynamic base path detection
+        this.basePath = document.querySelector('base')?.href || 
+                       window.location.pathname.replace(/\/[^\/]*$/, '') || 
+                       '';
         this.translations = {
             de: {
                 home: 'Home',
