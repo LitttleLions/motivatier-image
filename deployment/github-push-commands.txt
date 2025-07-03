@@ -1,0 +1,76 @@
+# GitHub Push Commands für motivatier-image Repository
+
+# 1. Git Repository initialisieren (falls noch nicht geschehen)
+git init
+
+# 2. Remote Repository hinzufügen
+git remote add origin https://github.com/LitttleLions/motivatier-image.git
+
+# 3. Alle Dateien für Commit vorbereiten
+git add .
+
+# 4. .gitignore erstellen (empfohlen)
+echo "__pycache__/" > .gitignore
+echo "*.pyc" >> .gitignore
+echo ".env" >> .gitignore
+echo "logs/" >> .gitignore
+echo "images/" >> .gitignore
+echo "attached_assets/" >> .gitignore
+
+# 5. Initial commit erstellen
+git commit -m "Initial commit: Flask Image Storage Service
+
+- Complete Flask application with blueprint structure
+- Image upload and thumbnail generation
+- Date-based folder organization
+- REST API endpoints (/api/upload, /api/list, /api/folder)
+- Modern dark-themed web interface
+- VPS deployment scripts for production
+- Plesk hosting configuration"
+
+# 6. Main branch auf Repository pushen
+git branch -M main
+git push -u origin main
+
+# Folgende Dateien werden übertragen:
+# 
+# Core Application:
+# - app.py (Flask application factory)
+# - main.py (Entry point)
+# - config.py (Configuration management)
+# - replit.md (Project documentation)
+# - pyproject.toml (Dependencies)
+#
+# Application Structure:
+# - blueprints/api.py (REST API endpoints)
+# - blueprints/ui.py (Web interface routes)
+# - services/storage.py (File management)
+# - services/thumbs.py (Thumbnail generation)
+# - services/external_storage.py (Cloud storage integration)
+#
+# Frontend:
+# - templates/index.html (Main web interface)
+# - static/css/ (Stylesheets)
+# - static/js/ (JavaScript functionality)
+#
+# Deployment:
+# - deployment/vps-setup.sh (Automated VPS setup)
+# - deployment/plesk-setup-guide.md (Plesk configuration)
+# - deployment/migration-guide.md (Migration instructions)
+# - deployment/README.md (Deployment overview)
+# - deployment/quick-setup.txt (Quick start guide)
+# - deployment/plesk-config.py (Plesk-specific config)
+# - deployment/passenger_wsgi.py (WSGI configuration)
+# - deployment/plesk-requirements.txt (Python dependencies)
+
+# ACHTUNG: Sensible Daten werden NICHT übertragen:
+# - images/ (User uploads)
+# - logs/ (Application logs)
+# - .env (Environment variables)
+# - __pycache__/ (Python cache)
+# - attached_assets/ (Replit attachments)
+
+# Nach dem Push ist das Repository bereit für:
+# 1. Deployment auf IONOS Cloud Server S mit Plesk
+# 2. Alternative VPS-Deployments
+# 3. Weitere Entwicklung und Collaboration

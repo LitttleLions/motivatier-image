@@ -1,0 +1,63 @@
+🚀 SCHNELL-ANLEITUNG: VPS Setup (15 Minuten)
+
+==============================================
+FÜR HETZNER/IONOS - Image Storage Service
+==============================================
+
+📋 VORBEREITUNG (5 Min):
+1. Server bestellen (Ubuntu 22.04 LTS, mindestens 1GB RAM)
+2. Server-IP notieren: _________________
+3. Domain/Subdomain festlegen: _________________
+4. DNS A-Record setzen: [subdomain] → [server-ip]
+
+🔧 INSTALLATION (10 Min):
+
+1. SSH-Verbindung:
+   ssh root@[SERVER-IP]
+
+2. Setup-Script herunterladen:
+   curl -fsSL https://raw.githubusercontent.com/[REPO]/main/deployment/vps-setup.sh -o setup.sh
+   chmod +x setup.sh
+
+3. Installation starten:
+   ./setup.sh [DOMAIN] [EMAIL]
+   
+   Beispiel:
+   ./setup.sh images.meinedomain.de admin@meinedomain.de
+
+✅ FERTIG!
+
+Nach 10-15 Minuten ist Ihr Service verfügbar unter:
+https://[DOMAIN]
+
+==============================================
+
+📊 WAS WIRD AUTOMATISCH INSTALLIERT:
+✅ Python 3.11 + Flask
+✅ Nginx Webserver
+✅ SSL-Zertifikat (Let's Encrypt)
+✅ Firewall-Schutz
+✅ Automatische Backups
+✅ Service-Monitoring
+✅ Log-Rotation
+
+💰 KOSTEN:
+- Hetzner CX11: €3.29/Monat
+- IONOS S-1: €1/Monat
+
+🔒 SICHERHEIT:
+- Automatische SSL-Verschlüsselung
+- Firewall aktiv
+- Regelmäßige Backups
+- Service-Überwachung
+
+📞 SUPPORT:
+Bei Problemen: journalctl -u image-storage -f
+
+==============================================
+
+IHRE BILDER SIND JETZT:
+✅ Permanent gespeichert (verschwinden NIE mehr)
+✅ Über HTTPS erreichbar
+✅ Für externe Verlinkung optimiert
+✅ Automatisch gesichert

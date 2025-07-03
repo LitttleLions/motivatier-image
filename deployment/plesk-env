@@ -1,0 +1,9 @@
+
+# Plesk Environment Configuration
+PLESK_ENVIRONMENT=1
+DOMAIN=ihre-domain.de
+BASE_PATH=httpdocs/images
+MAX_SIZE_MB=10
+ALLOWED_TYPES=image/jpeg,image/png,image/gif,image/webp
+SESSION_SECRET=HIER_SICHEREN_SCHLUESSEL_EINFUEGEN
+FLASK_ENV=production
