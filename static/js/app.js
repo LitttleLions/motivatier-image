@@ -385,8 +385,10 @@ class ImageStorageApp {
         this.showLoading(true);
 
         try {
-            const response = await fetch(`${this.basePath}/api/list?path=${encodeURIComponent(path)}`);
-            
+            const apiUrl = `${this.basePath}/api/list?path=${encodeURIComponent(path)}`;
+            console.log('Making API call to:', apiUrl);
+            const response = await fetch(apiUrl);
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -422,7 +424,9 @@ class ImageStorageApp {
 
     async createFolderByPath(path) {
         try {
-            const response = await fetch(`${this.basePath}/api/folder`, {
+            const apiUrl = `${this.basePath}/api/folder`;
+            console.log('Making createFolderByPath API call to:', apiUrl);
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -464,7 +468,9 @@ class ImageStorageApp {
         }
 
         try {
-            const response = await fetch(`${this.basePath}/api/folder`, {
+            const apiUrl = `${this.basePath}/api/folder`;
+            console.log('Making deleteFolder API call to:', apiUrl);
+            const response = await fetch(apiUrl, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -554,8 +560,10 @@ class ImageStorageApp {
         const allFolders = [];
 
         try {
-            const response = await fetch(`${this.basePath}/api/list?path=${encodeURIComponent(path)}`);
-            
+            const apiUrl = `${this.basePath}/api/list?path=${encodeURIComponent(path)}`;
+            console.log('Making getAllFoldersRecursively API call to:', apiUrl);
+            const response = await fetch(apiUrl);
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -858,10 +866,6 @@ class ImageStorageApp {
         this.addSubfolderAtPath(this.currentPath);
     }
 
-    addSubfolder() {
-        this.addSubfolderAtPath(this.currentPath);
-    }
-
     updateBreadcrumb(path) {
         const breadcrumb = document.getElementById('breadcrumb');
         let html = '<li class="breadcrumb-item"><a href="#" onclick="app.loadFolder(\'\')">Home</a></li>';
@@ -1026,7 +1030,9 @@ class ImageStorageApp {
         createBtn.disabled = true;
 
         try {
-            const response = await fetch(`${this.basePath}/api/folder`, {
+            const apiUrl = `${this.basePath}/api/folder`;
+            console.log('Making createFolder API call to:', apiUrl);
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
