@@ -21,8 +21,8 @@ def create_app():
     app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-    # Dynamic base path support
-    base_path = os.environ.get('APPLICATION_ROOT', '').rstrip('/')
+    # Dynamic base path support for subdirectory deployment
+    base_path = os.environ.get('APPLICATION_ROOT', '/motivatier-image').rstrip('/')
     if base_path:
         app.config['APPLICATION_ROOT'] = base_path
 
@@ -33,10 +33,11 @@ def create_app():
     from blueprints.api import api_bp
     from blueprints.ui import ui_bp
 
-    api_prefix = f"{base_path}/api" if base_path else "/api"
-    ui_prefix = base_path if base_path else None
+    # Configure for subdirectory deployment
+    api_prefix = f"{base_path}/api"
+    ui_prefix = base_path
 
-    # Register blueprints with dynamically constructed URL prefixes
+    # Register blueprints with subdirectory prefixes
     app.register_blueprint(api_bp, url_prefix=api_prefix)
     app.register_blueprint(ui_bp, url_prefix=ui_prefix)
 

@@ -6,7 +6,7 @@ class ImageStorageApp {
         this.selectedFiles = [];
         this.language = 'de'; // Default to German
         // Dynamic base path detection - configure for subdirectory deployment
-        this.basePath = '/motivatier-image';
+        this.basePath = window.location.pathname.includes('/motivatier-image') ? '/motivatier-image' : '';
         this.translations = {
             de: {
                 home: 'Home',
@@ -842,15 +842,6 @@ class ImageStorageApp {
 
     addSubfolder() {
         this.addSubfolderAtPath(this.currentPath);
-    }
-
-    // Method was missing - add it back
-    addSubfolderAtPath(parentPath) {
-        const folderName = prompt(this.t('enterFolderName'));
-        if (folderName && folderName.trim()) {
-            const fullPath = parentPath ? `${parentPath}/${folderName.trim()}` : folderName.trim();
-            this.createFolderByPath(fullPath);
-        }
     }
 
     updateBreadcrumb(path) {
