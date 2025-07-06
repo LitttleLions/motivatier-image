@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  image-storage-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:5000" # Map host port 8000 to container port 5000
+    volumes:
+      - ./images:/app/images # Ensure images are persisted outside the container
+      - .:/app # Mount the entire current directory to /app for hot-reloading
+      - ./logs:/app/logs # Ensure logs are persisted outside the container
+    environment:
+      - BASE_PATH=images
+      - MAX_SIZE_MB=10
+      - ALLOWED_TYPES=image/jpeg,image/png,image/gif,image/webp
+      - SESSION_SECRET=dev-secret-key-for-development # Use a dev secret
+      - FLASK_ENV=development # Set Flask environment to development
+      - FLASK_DEBUG=1 # Enable Flask debug mode for hot-reloading
+      - APPLICATION_ROOT=/motivatier-image # Set the application root for sub-path deployment
+      - FLASK_APP=app.py # Specify the main Flask application file
+    # Override the default command to run Flask development server
+    command: sh -c "python -m flask run --host=0.0.0.0 --port=5000 --debug"
+    restart: unless-stopped

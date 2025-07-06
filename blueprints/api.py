@@ -6,6 +6,8 @@ from services.storage import StorageService
 from services.thumbs import ThumbnailService
 import os
 import logging
+from pathlib import Path
+from services.storage import StorageService # Import StorageService
 
 logger = logging.getLogger(__name__)
 
@@ -31,102 +33,102 @@ def upload_file():
             folder = f"{now.year}/{now.month:02d}/{now.day:02d}"
 
         # Validate file type
-        if not StorageService.is_allowed_file(file.filename):
+        if not StorageService.is_allowed_file(file.mimetype):
             return jsonify({'error': 'File type not allowed'}), 400
 
         # Save file
-        result = StorageService.save_file(file, folder)
+        original_filename = file.filename
+        result = StorageService.save_file(file, folder, original_filename)
+        current_app.logger.info(f"File saved, result: {result}")
         
         # Generate thumbnail
         try:
-            ThumbnailService.create_thumbnail(result['filepath'])
+            # Ensure the correct path is passed for thumbnail generation
+            full_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], result['path'])
+            ThumbnailService.process_uploaded_image(full_file_path)
         except Exception as e:
             logger.warning(f"Failed to create thumbnail: {e}")
 
         return jsonify(result), 200
 
     except RequestEntityTooLarge:
+        current_app.logger.error("Upload error: File too large")
         return jsonify({'error': 'File too large'}), 413
     except Exception as e:
-        logger.error(f"Upload error: {e}")
+        current_app.logger.error(f"Upload error: {str(e)}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/file/rename', methods=['POST'])
+def rename_file():
+    try:
+        data = request.get_json()
+        if not data or 'path' not in data or 'newName' not in data:
+            return jsonify({'error': 'Path and newName required'}), 400
+
+        path = data['path'].strip()
+        new_name = data['newName'].strip()
+
+        result = StorageService.rename_file(path, new_name)
+        return jsonify(result), 200
+
+    except FileNotFoundError:
+        current_app.logger.error(f"Rename file error: File not found for path '{path}'")
+        return jsonify({'error': 'File not found'}), 404
+    except ValueError as e:
+        current_app.logger.error(f"Rename file error: {str(e)}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f"Rename file error: {str(e)}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/file', methods=['DELETE'])
+def delete_file():
+    try:
+        data = request.get_json()
+        if not data or 'path' not in data:
+            return jsonify({'error': 'Path required'}), 400
+
+        path = data['path'].strip()
+
+        result = StorageService.delete_file(path)
+        return jsonify(result), 200
+
+    except FileNotFoundError:
+        current_app.logger.error(f"Delete file error: File not found for path '{path}'")
+        return jsonify({'error': 'File not found'}), 404
+    except ValueError as e:
+        current_app.logger.error(f"Delete file error: {str(e)}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f"Delete file error: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/list', methods=['GET'])
 def list_files():
     try:
         path = request.args.get('path', '').strip()
-        logger.info(f"API /list called with path: '{path}'")
+        current_app.logger.info(f"API /list called with path: '{path}'")
         
         # Security check
         if '..' in path or path.startswith('/'):
-            logger.warning(f"Invalid path attempted: '{path}'")
+            current_app.logger.warning(f"Invalid path attempted: '{path}'")
             return jsonify({'error': 'Invalid path'}), 400
 
-        # Build full path
-        base_path = current_app.config['UPLOAD_FOLDER']
-        full_path = os.path.join(base_path, path) if path else base_path
-        logger.info(f"Full path: '{full_path}'")
-
-        if not os.path.exists(full_path):
-            logger.info(f"Path does not exist: '{full_path}'")
-            return jsonify([]), 200
-
-        if not os.path.isdir(full_path):
-            logger.warning(f"Path is not a directory: '{full_path}'")
-            return jsonify({'error': 'Path is not a directory'}), 400
-
-        files = []
+        # Use StorageService to list files
+        files_data = StorageService.list_files(path)
         
-        try:
-            for item in os.listdir(full_path):
-                if item.startswith('.'):  # Skip hidden files/folders
-                    continue
-                    
-                item_path = os.path.join(full_path, item)
-                relative_path = os.path.join(path, item) if path else item
-                
-                if os.path.isdir(item_path):
-                    files.append({
-                        'name': item,
-                        'path': relative_path,
-                        'type': 'directory'
-                    })
-                elif os.path.isfile(item_path):
-                    # Get file info
-                    stat = os.stat(item_path)
-                    
-                    # Build URLs with base path
-                    base_path = current_app.config.get('APPLICATION_ROOT', '')
-                    file_url = f"{base_path}/images/{relative_path}".replace('//', '/')
-                    
-                    # Check for thumbnail
-                    thumb_dir = os.path.join(os.path.dirname(item_path), '.thumbs')
-                    thumb_file = os.path.join(thumb_dir, f"thumb_{item}")
-                    thumb_url = None
-                    
-                    if os.path.exists(thumb_file):
-                        thumb_rel_path = os.path.join(os.path.dirname(relative_path), '.thumbs', f"thumb_{item}")
-                        thumb_url = f"{base_path}/images/{thumb_rel_path}".replace('//', '/')
-                    
-                    files.append({
-                        'name': item,
-                        'path': relative_path,
-                        'url': file_url,
-                        'thumb': thumb_url,
-                        'size': stat.st_size,
-                        'type': 'file'
-                    })
-                    
-        except PermissionError:
-            return jsonify({'error': 'Permission denied'}), 403
+        current_app.logger.info(f"Files returned by list_files: {files_data}")
         
         # Sort: directories first, then files
-        files.sort(key=lambda x: (x['type'] == 'file', x['name'].lower()))
+        files_data.sort(key=lambda x: (x['type'] == 'file', x['name'].lower()))
         
-        return jsonify(files), 200
+        return jsonify(files_data), 200
 
+    except PermissionError as e:
+        current_app.logger.error(f"List files error: Permission denied for path '{path}': {str(e)}", exc_info=True)
+        return jsonify({'error': 'Permission denied'}), 403
     except Exception as e:
-        logger.error(f"List files error: {e}")
+        current_app.logger.error(f"List files error: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/folder', methods=['POST'])
@@ -142,21 +144,13 @@ def create_folder():
         if not path or '..' in path or path.startswith('/'):
             return jsonify({'error': 'Invalid path'}), 400
 
-        # Create folder
-        base_path = current_app.config['UPLOAD_FOLDER']
-        full_path = os.path.join(base_path, path)
-        
-        # Check if folder already exists
-        if os.path.exists(full_path):
-            return jsonify({'error': 'Folder already exists'}), 409
-
-        # Create the folder and any parent directories
-        os.makedirs(full_path, exist_ok=True)
+        # Use StorageService to create folder
+        StorageService.create_folder(path)
         
         return jsonify({'message': 'Folder created successfully', 'path': path}), 201
 
     except Exception as e:
-        logger.error(f"Create folder error: {e}")
+        current_app.logger.error(f"Create folder error: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/folder', methods=['DELETE'])
@@ -172,26 +166,13 @@ def delete_folder():
         if not path or '..' in path or path.startswith('/'):
             return jsonify({'error': 'Invalid path'}), 400
 
-        # Delete folder
-        base_path = current_app.config['UPLOAD_FOLDER']
-        full_path = os.path.join(base_path, path)
-        
-        if not os.path.exists(full_path):
-            return jsonify({'error': 'Folder not found'}), 404
+        # Use StorageService to delete folder
+        StorageService.delete_folder(path) # Assuming StorageService will have a delete_folder method
 
-        if not os.path.isdir(full_path):
-            return jsonify({'error': 'Path is not a directory'}), 400
-
-        # Check if folder is empty
-        if os.listdir(full_path):
-            return jsonify({'error': 'Folder is not empty'}), 400
-
-        os.rmdir(full_path)
-        
         return jsonify({'message': 'Folder deleted successfully'}), 200
 
     except Exception as e:
-        logger.error(f"Delete folder error: {e}")
+        current_app.logger.error(f"Delete folder error: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/folder/rename', methods=['POST'])
@@ -208,24 +189,11 @@ def rename_folder():
         if not old_path or not new_path or '..' in old_path or '..' in new_path:
             return jsonify({'error': 'Invalid path'}), 400
 
-        # Rename folder
-        base_path = current_app.config['UPLOAD_FOLDER']
-        old_full_path = os.path.join(base_path, old_path)
-        new_full_path = os.path.join(base_path, new_path)
-        
-        if not os.path.exists(old_full_path):
-            return jsonify({'error': 'Source folder not found'}), 404
-
-        if os.path.exists(new_full_path):
-            return jsonify({'error': 'Destination folder already exists'}), 409
-
-        # Create parent directory if needed
-        os.makedirs(os.path.dirname(new_full_path), exist_ok=True)
-        
-        os.rename(old_full_path, new_full_path)
+        # Use StorageService to rename folder
+        StorageService.rename_folder(old_path, new_path) # Assuming StorageService will have a rename_folder method
         
         return jsonify({'message': 'Folder renamed successfully'}), 200
 
     except Exception as e:
-        logger.error(f"Rename folder error: {e}")
+        current_app.logger.error(f"Rename folder error: {str(e)}", exc_info=True)
         return jsonify({'error': str(e)}), 500
