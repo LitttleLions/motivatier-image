@@ -27,25 +27,35 @@ Ein professioneller Bildspeicher-Service mit Web-Interface und API, optimiert f�
 - **Max. Dateigröße**: 10MB (konfigurierbar)
 - **Thumbnail**: Automatisch generiert
 
-## 🚀 Schnellstart (Entwicklung)
+## 🚀 Schnellstart (Entwicklung mit Docker Compose)
 
-1. **Repository klonen:**
-   ```bash
-   git clone https://github.com/ihr-username/image-storage-service.git
-   cd image-storage-service
-   ```
+Um die Anwendung lokal zu entwickeln und zu testen, verwenden Sie Docker Compose. Dies ermöglicht Hot-Reloading und simuliert die Produktionsumgebung genauer.
 
-2. **Abhängigkeiten installieren:**
-   ```bash
-   pip install -r pyproject.toml
-   ```
+1.  **Repository klonen:**
+    ```bash
+    git clone https://github.com/ihr-username/image-storage-service.git
+    cd image-storage-service
+    ```
 
-3. **Starten:**
-   ```bash
-   python main.py
-   ```
+2.  **Entwicklungsumgebung starten:**
+    Stellen Sie sicher, dass Docker auf Ihrem System installiert und ausgeführt wird.
+    ```bash
+    ./run_dev.sh
+    ```
+    Dieser Befehl baut das Docker-Image, startet den Flask-Entwicklungsserver und mountet den Quellcode, sodass Änderungen sofort wirksam werden.
 
-4. **Öffnen:** http://localhost:5000
+3.  **Anwendung öffnen:**
+    Die Anwendung ist nun unter folgender URL verfügbar:
+    [http://localhost:8000/motivatier-image/](http://localhost:8000/motivatier-image/)
+
+    Die API-Endpunkte sind unter `http://localhost:8000/motivatier-image/api/...` erreichbar.
+
+**Troubleshooting (Lokale Entwicklung):**
+Sollten beim Starten der Docker Compose Umgebung Probleme auftreten (z.B. "Error during connect" oder "No such file or directory"), versuchen Sie folgende Schritte:
+*   Stellen Sie sicher, dass Docker Desktop auf Ihrem System läuft und gestartet ist.
+*   Versuchen Sie, Docker Desktop neu zu starten.
+*   Stellen Sie sicher, dass WSL 2 (Windows Subsystem for Linux 2) auf dem neuesten Stand ist (`wsl --update` in Ihrer PowerShell/CMD).
+*   Überprüfen Sie, ob der Docker-Dienst unter Windows ausgeführt wird.
 
 ## 🌐 Produktions-Deployment
 

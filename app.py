@@ -1,5 +1,6 @@
 import os
 import logging
+import sys # Import sys
 from logging.handlers import RotatingFileHandler
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -9,11 +10,18 @@ from config import Config
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
+# Configure logging to file and console
 logging.basicConfig(
-    handlers=[RotatingFileHandler('logs/app.log', maxBytes=10000000, backupCount=10)],
-    level=logging.INFO,
+    handlers=[
+        RotatingFileHandler('logs/app.log', maxBytes=10000000, backupCount=10),
+        logging.StreamHandler(sys.stdout) # Add StreamHandler to output logs to console
+    ],
+    level=logging.DEBUG, # Set to DEBUG for more detailed logging
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
+
+# Set Werkzeug logger to DEBUG as well for detailed request/response info
+logging.getLogger('werkzeug').setLevel(logging.DEBUG)
 
 def create_app():
     app = Flask(__name__)
@@ -24,6 +32,8 @@ def create_app():
     # Dynamic base path support for subdirectory deployment
     base_path = os.environ.get('APPLICATION_ROOT', '/motivatier-image').rstrip('/')
     app.config['APPLICATION_ROOT'] = base_path
+    app.logger.info(f"App initialized with APPLICATION_ROOT: {app.config['APPLICATION_ROOT']}")
+    app.logger.info(f"Calculated base_path for blueprints: {base_path}")
 
     from blueprints.api import api_bp
     from blueprints.ui import ui_bp

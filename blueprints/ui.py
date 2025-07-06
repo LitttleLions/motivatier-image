@@ -12,12 +12,15 @@ def index():
 def serve_image(filename):
     """Serve uploaded images"""
     try:
+        current_app.logger.info(f"Serving image: {filename}")
         # Security check to prevent directory traversal
         if '..' in filename or filename.startswith('/'):
+            current_app.logger.warning(f"Attempted directory traversal: {filename}")
             abort(403)
 
         upload_folder = current_app.config['UPLOAD_FOLDER']
         file_path = os.path.join(upload_folder, filename)
+        current_app.logger.info(f"Resolved file_path for serving: {file_path}")
 
         # Check if file exists and is within upload folder
         if not os.path.exists(file_path) or not os.path.commonpath([upload_folder, file_path]) == upload_folder:
