@@ -26,7 +26,6 @@ class StorageService:
     def save_file(file, folder_path=None, original_filename=None):
         """Save uploaded file with proper organization and create sidecar JSON"""
         try:
-            logger.info(f"StorageService.save_file: Received folder_path: '{folder_path}'")
             # Use provided folder or generate date-based path
             # Remove leading/trailing slashes and ensure it's safe
             # If folder_path is '.' or empty, treat as UPLOAD_FOLDER root
@@ -124,6 +123,11 @@ class StorageService:
                 current_app.logger.info(f"StorageService.list_files processing item: {item}")
                 if item.startswith('.'):
                     current_app.logger.info(f"StorageService.list_files skipping hidden item: {item}")
+                    continue
+                
+                # Skip .json files as they are sidecar metadata and not to be displayed as separate files
+                if item.endswith('.json'):
+                    current_app.logger.info(f"StorageService.list_files skipping JSON metadata file: {item}")
                     continue
                     
                 item_path = os.path.join(full_path, item)

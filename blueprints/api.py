@@ -25,7 +25,6 @@ def upload_file():
 
         # Get folder from form data
         folder = request.form.get('folder', '').strip()
-        current_app.logger.info(f"API /upload: Received folder: '{folder}'")
         
         if not folder:
             return jsonify({'error': 'Folder path not provided'}), 400

@@ -91,7 +91,7 @@ class ImageStorageApp {
     bindEvents() {
         document.getElementById('savePublicBaseUrlBtn').addEventListener('click', () => this.savePublicBaseUrl());
         document.getElementById('resetPublicBaseUrlBtn').addEventListener('click', () => this.resetPublicBaseUrl());
-        document.getElementById('uploadBtn').addEventListener('click', () => this.uploadManager.uploadFiles()); // Delegate to uploadManager
+        document.getElementById('uploadBtn').addEventListener('click', () => this.uploadManager.uploadFiles()); // Re-added click listener
         document.getElementById('createFolderBtn').addEventListener('click', () => this.fileManagement.createFolder(
             document.getElementById('folderPath').value.trim() || 
             (document.getElementById('folderParentSelect').value ? `${document.getElementById('folderParentSelect').value}/${document.getElementById('folderName').value.trim()}` : document.getElementById('folderName').value.trim())
@@ -163,6 +163,7 @@ class ImageStorageApp {
     }
 
     async loadFolder(path) {
+        console.log(`[App] loadFolder called with path: ${path}`);
         this.currentPath = path;
         this.ui.showLoading(true); // Use ui.showLoading
 
@@ -171,6 +172,7 @@ class ImageStorageApp {
             
             // Filter out directories from the main file grid
             const filesOnly = data.filter(item => item.type === 'file');
+            console.log(`[App] loadFolder received ${filesOnly.length} files. Calling renderFiles.`);
             this.renderFiles(filesOnly);
 
             this.updateBreadcrumb(path);
@@ -214,9 +216,13 @@ class ImageStorageApp {
     }
 
     renderFiles(files) {
+        console.log(`[App] renderFiles called with ${files.length} files.`);
         const fileGrid = document.getElementById('fileGrid');
         const emptyState = document.getElementById('emptyState');
-        fileGrid.innerHTML = ''; // Clear previous files
+        
+        // Clear previous files and log its state
+        fileGrid.innerHTML = ''; 
+        console.log(`[App] fileGrid cleared. InnerHTML length: ${fileGrid.innerHTML.length}`);
 
         if (files.length === 0) {
             emptyState.classList.remove('d-none');
@@ -225,7 +231,7 @@ class ImageStorageApp {
             emptyState.classList.add('d-none');
         }
 
-        files.forEach(file => {
+        files.forEach((file, index) => { // Added index to the loop
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
 
@@ -242,7 +248,7 @@ class ImageStorageApp {
                 <div class="file-thumbnail">
                     <img src="${displayThumbnailUrl}" alt="${file.display_name}" loading="lazy" onerror="this.onerror=null;this.src='${(displayImageUrl).replace(/'/g, "\\'")}'">
                     <div class="file-overlay">
-                        <button class="btn-overlay view-btn" onclick="app.previewModal.previewImage('${copyImageUrl.replace(/'/g, "\\'")}', '${file.display_name.replace(/'/g, "\\'")}')">
+                        <button class="btn-overlay view-btn" data-file-index="${index}">
                             <i class="fas fa-eye"></i>
                         </button>
                         <button class="btn-overlay copy-btn" onclick="app.previewModal.copyUrl('${copyImageUrl.replace(/'/g, "\\'")}')">
@@ -283,6 +289,15 @@ class ImageStorageApp {
                     const path = e.currentTarget.dataset.path;
                     const name = e.currentTarget.dataset.name;
                     this.fileManagement.deleteFile(path, name); // Delegate to fileManagement
+                });
+            }
+
+            // Bind click event for view button
+            const viewBtn = fileItem.querySelector('.view-btn');
+            if (viewBtn) {
+                viewBtn.addEventListener('click', (e) => {
+                    const fileIndex = parseInt(e.currentTarget.dataset.fileIndex);
+                    this.previewModal.previewImage(files, fileIndex); // Pass all files and the clicked index
                 });
             }
         });

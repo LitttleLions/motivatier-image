@@ -38,13 +38,16 @@ class FolderTreeView {
 
             li.innerHTML = `
                 <div class="folder-header">
-                    <span class="folder-name" data-path="${folderPath}">${folder.name}</span>
+                    <span class="folder-name" data-path="${folderPath}"><i class="fas fa-folder"></i> ${folder.name}</span>
                     <div class="folder-actions">
                         <button class="btn-action rename-folder-btn" data-path="${folderPath}" title="${this.app.t('renameFolder')}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn-action delete-folder-btn" data-path="${folderPath}" title="${this.app.t('deleteFolder')}">
                             <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn-action add-subfolder-btn" data-path="${folderPath}" title="${this.app.t('addSubfolder')}" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+                            <i class="fas fa-folder-plus"></i>
                         </button>
                     </div>
                 </div>
@@ -57,6 +60,12 @@ class FolderTreeView {
                 const path = e.currentTarget.dataset.path;
                 console.log('Folder clicked:', path); // Debugging log
                 this.app.loadFolder(path);
+            });
+
+            // Bind event for add subfolder button
+            li.querySelector('.add-subfolder-btn').addEventListener('click', (e) => {
+                const path = e.currentTarget.dataset.path;
+                this.app.fileManagement.addSubfolderAtPath(path);
             });
 
             // Bind events for rename and delete buttons

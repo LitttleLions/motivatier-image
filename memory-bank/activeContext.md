@@ -15,9 +15,24 @@ Der Hauptfokus lag auf der Behebung von Problemen mit der URL-Generierung und de
     *   **`services/storage.py`:** Die Methode `get_date_path()` wurde entfernt. Die Methode `save_file()` wurde angepasst, um den `folder_path` direkt zu verwenden und keine Datumsordner mehr zu generieren.
     *   **`blueprints/api.py`:** Die Logik zur Behandlung von `AUTO_DATE` wurde aus der `upload_file`-Funktion entfernt. Es wird nun erwartet, dass ein gültiger `folder`-Pfad vom Frontend übermittelt wird.
     *   **`static/js/upload-manager.js` und `static/js/app.js`:** Es waren keine Änderungen erforderlich, da diese Dateien den aktuellen Pfad bereits korrekt an das Backend übergeben.
-5.  **Behebung des "Folder path not provided"-Fehlers**:
-    *   **`static/js/upload-manager.js`**: Die Logik wurde angepasst, um `.` als Ordnerpfad an das Backend zu senden, wenn der aktuelle Pfad leer ist (Root-Verzeichnis).
+5.  **Behebung des "Folder path not provided"-Fehlers und Korrektur des Upload-Pfades**:
+    *   **`static/js/upload-manager.js`**: Die Logik wurde angepasst, um `.` als Ordnerpfad an das Backend zu senden, wenn der aktuelle Pfad leer ist (Root-Verzeichnis). Die Logik zur Bestimmung des `selectedFolder` wurde verfeinert, um sicherzustellen, dass `this.app.currentPath` korrekt als Standard verwendet wird, es sei denn, ein benutzerdefinierter Pfad wird eingegeben.
     *   **`services/storage.py`**: Die `save_file()`-Methode wurde angepasst, um `.` oder einen leeren String (`''`) als gültigen Root-Pfad zu akzeptieren und das Bild direkt im `UPLOAD_FOLDER` zu speichern.
+6.  **Entfernung von Debugging-Zeilen**: Alle temporären Debugging-Zeilen wurden aus `static/js/upload-manager.js`, `static/js/app.js`, `blueprints/api.py` und `services/storage.py` entfernt.
+7.  **Behebung des doppelten Uploads**: Der doppelte Event-Listener für den Upload-Button in `static/js/app.js` wurde entfernt, um zu verhindern, dass Dateien zweimal hochgeladen werden.
+8.  **Behebung der doppelten Anzeige nach Upload**: Der redundante Aufruf von `this.app.folderTree.loadFolderTree()` nach einem Upload in `static/js/upload-manager.js` wurde entfernt, um zu verhindern, dass Dateien zweimal in der Dateiliste angezeigt werden.
+9. **Verbesserung des Folder Trees**: Die CSS-Regeln in `static/css/custom.css` wurden aktualisiert, um eine modernere Darstellung des Folder Trees zu ermöglichen, und in `static/js/folder-tree-view.js` wurde ein Ordner-Icon hinzugefügt.
+10. **Automatisches Schließen von Modals**:
+    *   Das Upload-Modal wird nach erfolgreichem Upload automatisch geschlossen (`static/js/upload-manager.js`).
+    *   Das "New Folder"-Modal wird nach erfolgreicher Ordnererstellung automatisch geschlossen (`static/js/file-management.js`).
+11. **Bildvorschau-Korrekturen und Navigation**:
+    *   Die `previewImage`-Methode in `static/js/preview-modal.js` wurde so angepasst, dass sie die relative URL für die Bildvorschau verwendet.
+    *   Die Navigation zwischen Bildern im Preview-Modal (vorheriges/nächstes Bild) wurde implementiert, indem die Dateiliste und der aktuelle Index verfolgt werden und Event-Listener für Pfeiltasten und Navigationsbuttons hinzugefügt wurden (`static/js/app.js`, `static/js/preview-modal.js`, `templates/index.html`).
+12. **Folder Tree - "Add Subfolder" Button und Sichtbarkeit**:
+    *   Der "Add Subfolder"-Button wurde in `static/js/folder-tree-view.js` wiederhergestellt.
+    *   Die Sichtbarkeit der Buttons im Folder Tree wurde durch Anpassung der Farbe in `static/css/custom.css` verbessert.
+13. **Korrektur der Ordnererstellung und Auswahl des übergeordneten Ordners**:
+    *   Die `addSubfolderAtPath`-Methode wurde in `static/js/file-management.js` hinzugefügt, um das "New Folder"-Modal korrekt mit dem übergeordneten Ordner vorauszufüllen.
 
 ## Aktuelle Entscheidungen und Überlegungen
 *   Die Trennung der URL-Zuständigkeiten zwischen Backend (relative Pfade zum UPLOAD_FOLDER) und Frontend (vollständige URLs mit APPLICATION_ROOT) hat sich als effektiv erwiesen, um das Problem der doppelten Pfade zu lösen.
