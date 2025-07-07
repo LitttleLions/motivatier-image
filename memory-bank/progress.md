@@ -18,16 +18,15 @@
     *   Supports dynamic `APPLICATION_ROOT` for subdirectory deployments.
     *   Includes settings for CGI and Replit environments.
 *   **Root Folder Upload**: Files can now be uploaded directly to the root of the configured `UPLOAD_FOLDER`.
+*   **Automated Deployment (Direct Python App on Plesk)**: Instructions have been provided for setting up automated deployment on Plesk using GitHub integration for direct Python applications. This includes configuring Git integration, Python app settings, and dependency installation.
 
 ## What's Left to Build (Discrepancies/Missing Features based on PRD)
 *   **F-3 Metadaten ohne DB (Metadata without DB)**:
-    *   **Sidecar JSON files**: The `StorageService.save_file` currently saves the image but does NOT create the accompanying `filename.json` sidecar file to store metadata (name, size, type, upload date, etc.) as specified in the PRD. This is a critical missing piece.
-    *   **Editable Original Name**: The UI should allow editing of the original name, which implies this metadata needs to be stored and retrievable.
+    *   **Editable Original Name**: The UI should allow editing of the original name, which implies this metadata needs to be stored and retrievable. (Backend: Update metadata in sidecar JSON).
 *   **F-4 Verzeichnis-Listing (Directory Listing)**:
     *   The `list_files` API endpoint returns file information, but the UI needs to render these with thumbnails and provide sorting options (Name or Upload-Datum). The "Upload-Datum" implies storing this in the sidecar JSON.
 *   **User-Flows**:
     *   **Startseite → Ordnerbaum erscheint**: The UI (`index.html` und `app.js`) needs to implement the folder tree view.
-    *   **Drag-&-Drop Upload oder Dateidialog**: The UI needs to implement the drag-and-drop and file dialog for uploads.
     *   **Nach dem Upload: Thumbnail, Originalname (bearbeitbar), Öffentliche URL mit “Copy”-Button**: The UI needs to display these elements after upload.
     *   **Optionale Massen-Uploads wiederholen**: The UI needs this functionality.
 *   **"Lovability" UX-Prinzipien (Section 8)**: Many of these are UI/UX related and require frontend implementation:
@@ -40,8 +39,7 @@
 ## Current Status
 *   Core backend logic for file and folder management is mostly in place.
 *   Key functional requirements related to file-based metadata (`F-3`) and UI interactions (User-Flows, "Lovability") are either partially implemented or entirely missing.
-*   A significant bug exists where `api.py` calls `ThumbnailService.create_thumbnail` which is not the correct method name in `services/thumbs.py` (should be `process_uploaded_image`).
-*   The `StorageService` in `services/storage.py` has a duplicate class definition that needs to be resolved.
+*   **Drag-&-Drop Upload oder Dateidialog**: Diese Funktion ist jetzt implementiert und funktioniert.
 *   **Neue Upload-Logik implementiert**: Die automatische datumsbasierte Ordnererstellung wurde im Backend entfernt. Bilder werden nun direkt in den vom Frontend übermittelten Pfad hochgeladen.
 *   **"Folder path not provided" Fehler behoben**: Uploads in den Root-Ordner funktionieren jetzt korrekt.
 *   **Korrektur des Upload-Pfades für Unterordner**: Der `UploadManager` im Frontend wurde korrigiert, um den korrekten aktuellen Ordnerpfad an das Backend zu senden, wenn in Unterordner hochgeladen wird.
@@ -55,12 +53,10 @@
 *   **Korrektur der Ordnererstellung und Auswahl des übergeordneten Ordners**: Die `addSubfolderAtPath`-Methode wurde in `static/js/file-management.js` hinzugefügt, um das "New Folder"-Modal korrekt mit dem übergeordneten Ordner vorauszufüllen.
 
 ## Known Issues
-*   Duplicate `StorageService` class definition in `services/storage.py`.
-*   Incorrect method call for thumbnail generation in `api.py`.
-*   Lack of sidecar JSON file creation for image metadata.
 *   Frontend (HTML/JS) implementation for many UI/UX features is yet to be reviewed/implemented.
 
 ## Evolution of Project Decisions
 *   The project started with a strong emphasis on a database-less approach, which is maintained in the current backend structure.
 *   The decision to use Flask with Blueprints and separate services has led to a modular and maintainable backend.
 *   The detailed PRD highlights several areas where the current implementation needs to be enhanced, especially regarding metadata handling and frontend user experience.
+*   **Deployment Strategy**: The user has chosen "Direct Python Application Deployment" on Plesk to leverage its built-in Git integration for automated updates and application restarts.
