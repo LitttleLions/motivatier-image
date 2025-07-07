@@ -6,13 +6,18 @@ Der Hauptfokus lag auf der Behebung von Problemen mit der URL-Generierung und de
 ## Neueste Änderungen
 1.  **`blueprints/api.py`:** Die URL-Generierung für Bilder und Thumbnails wurde angepasst. Die API gibt nun Pfade relativ zum `UPLOAD_FOLDER` zurück, ohne den `APPLICATION_ROOT` voranzustellen. Dies wurde durch die Entfernung des `app_root`-Präfixes in den `file_url` und `thumb_url` Feldern erreicht. Neue API-Endpunkte (`/api/file/rename` und `/api/file`) wurden für das Umbenennen und Löschen von Dateien hinzugefügt.
     *   **Lösungshinweis:** Die Flask-Anwendung (`app.py`) kümmert sich um das Routing des `ui_bp` unter dem `APPLICATION_ROOT`, sodass die URLs, die vom `api_bp` geliefert werden, nur den relativen Pfad innerhalb des `UPLOAD_FOLDER` benötigen. Das Frontend ist für das Voranstellen des `APPLICATION_ROOT` verantwortlich.
-
 2.  **`services/storage.py`:** Die `list_files`-Methode wurde erweitert, um den vollständigen relativen Pfad der Datei (`file.path`) an das Frontend zu übergeben, was für die Umbenennungs- und Löschfunktionen notwendig ist. Neue Methoden `rename_file` und `delete_file` wurden implementiert, um die Dateisystemoperationen sicher durchzuführen.
-
 3.  **`static/js/app.js`:**
     *   Das Frontend wurde aktualisiert, um die vollständigen URLs für Bilder und Thumbnails korrekt zu konstruieren. Dies beinhaltet das Hinzufügen des `this.basePath` (welches `APPLICATION_ROOT` enthält) und des `/images/`-Präfixes zu den relativen Pfaden, die von der API kommen.
     *   Die `onerror`-Funktion für die Bildanzeige wurde korrigiert, um die "komischen Sonderzeichen" zu vermeiden, die durch fehlerhaftes Escaping im gerenderten HTML verursacht wurden. Dies wurde durch die korrekte Verwendung von `\'` für einfache Anführungszeichen innerhalb des `style`-Attributs des `innerHTML`-Strings behoben.
     *   Buttons für das Umbenennen und Löschen von Dateien wurden zur Benutzeroberfläche hinzugefügt und rufen die entsprechenden Backend-API-Endpunkte auf.
+4.  **Entfernung der Datumsordner-Logik**: Die automatische Erstellung von Datumsordnern (`YYYY/MM/DD`) für hochgeladene Bilder wurde entfernt. Bilder werden nun direkt in den vom Frontend übermittelten Ordnerpfad gespeichert.
+    *   **`services/storage.py`:** Die Methode `get_date_path()` wurde entfernt. Die Methode `save_file()` wurde angepasst, um den `folder_path` direkt zu verwenden und keine Datumsordner mehr zu generieren.
+    *   **`blueprints/api.py`:** Die Logik zur Behandlung von `AUTO_DATE` wurde aus der `upload_file`-Funktion entfernt. Es wird nun erwartet, dass ein gültiger `folder`-Pfad vom Frontend übermittelt wird.
+    *   **`static/js/upload-manager.js` und `static/js/app.js`:** Es waren keine Änderungen erforderlich, da diese Dateien den aktuellen Pfad bereits korrekt an das Backend übergeben.
+5.  **Behebung des "Folder path not provided"-Fehlers**:
+    *   **`static/js/upload-manager.js`**: Die Logik wurde angepasst, um `.` als Ordnerpfad an das Backend zu senden, wenn der aktuelle Pfad leer ist (Root-Verzeichnis).
+    *   **`services/storage.py`**: Die `save_file()`-Methode wurde angepasst, um `.` oder einen leeren String (`''`) als gültigen Root-Pfad zu akzeptieren und das Bild direkt im `UPLOAD_FOLDER` zu speichern.
 
 ## Aktuelle Entscheidungen und Überlegungen
 *   Die Trennung der URL-Zuständigkeiten zwischen Backend (relative Pfade zum UPLOAD_FOLDER) und Frontend (vollständige URLs mit APPLICATION_ROOT) hat sich als effektiv erwiesen, um das Problem der doppelten Pfade zu lösen.

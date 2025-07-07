@@ -25,12 +25,10 @@ def upload_file():
 
         # Get folder from form data
         folder = request.form.get('folder', '').strip()
+        current_app.logger.info(f"API /upload: Received folder: '{folder}'")
         
-        # Handle AUTO_DATE folder
-        if folder == 'AUTO_DATE':
-            from datetime import datetime
-            now = datetime.now()
-            folder = f"{now.year}/{now.month:02d}/{now.day:02d}"
+        if not folder:
+            return jsonify({'error': 'Folder path not provided'}), 400
 
         # Validate file type
         if not StorageService.is_allowed_file(file.mimetype):
