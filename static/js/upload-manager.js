@@ -205,12 +205,15 @@ class UploadManager {
             return;
         }
 
-        // Get selected folder - use custom input if visible, otherwise use select
-        let selectedFolder = folderInput.classList.contains('d-none') 
-            ? folderSelect.value 
-            : folderInput.value.trim();
-
-        // If currentPath is empty (root folder), send '.' to the backend
+        // Get selected folder - prioritize custom input, otherwise use the current app path
+        let selectedFolder;
+        if (!folderInput.classList.contains('d-none')) { // If custom input is visible
+            selectedFolder = folderInput.value.trim();
+        } else { // Otherwise, use the current path from the app instance
+            selectedFolder = this.app.currentPath;
+        }
+        
+        // If selectedFolder is empty (representing the root folder), send '.' to the backend
         if (selectedFolder === '') {
             selectedFolder = '.';
         }
@@ -237,11 +240,7 @@ class UploadManager {
 
                 const formData = new FormData();
                 formData.append('file', file);
-                if (selectedFolder) {
                 formData.append('folder', selectedFolder);
-                }
-                console.log('UploadManager: Sending folder to backend:', selectedFolder); // Debugging line
-
                 const result = await this.app.api.uploadFile(formData);
 
                 completed++;
@@ -249,8 +248,6 @@ class UploadManager {
                 progressFill.style.width = `${progress}%`;
 
                 statusDiv.innerHTML = '<span class="status-success"><i class="fas fa-check"></i> Uploaded</span>';
-
-                console.log('Uploaded:', result);
 
             } catch (error) {
                 console.error('Upload error:', error);
@@ -263,18 +260,20 @@ class UploadManager {
 
         if (completed > 0) {
             this.app.ui.showToast(`${this.app.t('uploadFilesSuccess')} ${completed} file(s)`, 'success');
-            this.app.loadFolder(this.app.currentPath);
-            this.app.folderTree.loadFolderTree(); // Corrected method call
+            this.app.loadFolder(this.app.currentPath); // This should be sufficient to refresh the file list
 
             // Reset form immediately
             const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
             if (modal) {
+                console.log('[UploadManager] Hiding upload modal.');
                 modal.hide();
+            } else {
+                console.warn('[UploadManager] Could not get Bootstrap modal instance for uploadModal.');
             }
             this.resetUploadForm();
-        } else {
-            uploadBtn.disabled = false;
-        }
+        } 
+        // Always re-enable the upload button after the process, successful or not
+        uploadBtn.disabled = false;
     }
 
     resetUploadForm() {

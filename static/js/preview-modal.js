@@ -3,20 +3,87 @@
 class PreviewModal {
     constructor(appInstance) {
         this.app = appInstance; // Reference to the main app instance
+        this.files = []; // To store the list of files for navigation
+        this.currentIndex = 0; // To store the current index in the files array
+        this.modalElement = document.getElementById('previewModal');
+        this.previewImageElement = document.getElementById('previewImage');
+        this.previewTitleElement = document.getElementById('previewTitle');
+        this.imageUrlInput = document.getElementById('imageUrl');
+
+        // Bind keyboard events for navigation
+        this.modalElement.addEventListener('shown.bs.modal', () => {
+            document.addEventListener('keydown', this.handleKeyDown);
+        });
+        this.modalElement.addEventListener('hidden.bs.modal', () => {
+            document.removeEventListener('keydown', this.handleKeyDown);
+        });
+
+        // Bind navigation buttons (if they exist in the modal HTML)
+        const prevBtn = this.modalElement.querySelector('#previewPrevBtn');
+        const nextBtn = this.modalElement.querySelector('#previewNextBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.showPreviousImage());
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.showNextImage());
+        }
     }
 
-    previewImage(url, name) {
-        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-        const image = document.getElementById('previewImage');
-        const title = document.getElementById('previewTitle');
-        const urlInput = document.getElementById('imageUrl');
+    handleKeyDown = (event) => {
+        if (event.key === 'ArrowLeft') {
+            this.showPreviousImage();
+        } else if (event.key === 'ArrowRight') {
+            this.showNextImage();
+        }
+    }
 
-        title.textContent = name;
-        image.src = url;
-        // The 'url' passed here is already the full, absolute URL, so no need to prefix again
-        urlInput.value = url; 
-
+    // Updated to accept files array and current index
+    previewImage(files, startIndex) {
+        this.files = files;
+        this.currentIndex = startIndex;
+        this.updateModalContent();
+        const modal = new bootstrap.Modal(this.modalElement);
         modal.show();
+    }
+
+    updateModalContent() {
+        if (this.files.length === 0) return;
+
+        const file = this.files[this.currentIndex];
+        
+        // Construct the display URL using the app's basePath
+        const displayImageUrl = `${this.app.basePath === '/' ? '' : this.app.basePath}/images/${file.url}`;
+        
+        // Construct the URL for copying (uses publicBaseUrl if set)
+        const copyImageUrl = `${this.app.publicBaseUrl || (window.location.origin + (this.app.basePath === '/' ? '' : this.app.basePath) + '/') }images/${file.url}`;
+
+        this.previewTitleElement.textContent = file.display_name;
+        this.previewImageElement.src = displayImageUrl;
+        this.imageUrlInput.value = copyImageUrl;
+
+        // Update navigation button states
+        const prevBtn = this.modalElement.querySelector('#previewPrevBtn');
+        const nextBtn = this.modalElement.querySelector('#previewNextBtn');
+        if (prevBtn) {
+            prevBtn.disabled = this.currentIndex === 0;
+        }
+        if (nextBtn) {
+            nextBtn.disabled = this.currentIndex === this.files.length - 1;
+        }
+    }
+
+    showNextImage() {
+        if (this.currentIndex < this.files.length - 1) {
+            this.currentIndex++;
+            this.updateModalContent();
+        }
+    }
+
+    showPreviousImage() {
+        if (this.currentIndex > 0) {
+            this.currentIndex--;
+            this.updateModalContent();
+        }
     }
 
     copyUrl(url) {

@@ -15,6 +15,12 @@ class FileManagement {
             this.app.ui.showToast(this.app.t('folderCreatedSuccess'), 'success');
             await this.app.folderTree.loadFolderTree(); // Delegate to folderTree
             await this.app.loadFolder(this.app.currentPath); // Refresh current view
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newFolderModal'));
+            if (modal) {
+                modal.hide();
+            }
 
         } catch (error) {
             console.error('Create folder error:', error);
@@ -103,6 +109,27 @@ class FileManagement {
             console.error('Delete file error:', error);
             this.app.ui.showToast(this.app.t('fileDeleteFailed') + ': ' + error.message, 'error'); // Use translation
         }
+    }
+
+    // New method to pre-fill the parent folder in the newFolderModal
+    addSubfolderAtPath(parentPath) {
+        // Set the selected parent folder in the modal's dropdown
+        const folderParentSelect = document.getElementById('folderParentSelect');
+        if (folderParentSelect) {
+            // Find the option that matches the parentPath
+            for (let i = 0; i < folderParentSelect.options.length; i++) {
+                if (folderParentSelect.options[i].value === parentPath) {
+                    folderParentSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        // Optionally, clear the folder name input for a new subfolder
+        const folderNameInput = document.getElementById('folderName');
+        if (folderNameInput) {
+            folderNameInput.value = '';
+        }
+        // Show the modal - it's already triggered by data-bs-target in HTML
     }
 }
 

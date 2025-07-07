@@ -26,7 +26,7 @@
 *   **F-4 Verzeichnis-Listing (Directory Listing)**:
     *   The `list_files` API endpoint returns file information, but the UI needs to render these with thumbnails and provide sorting options (Name or Upload-Datum). The "Upload-Datum" implies storing this in the sidecar JSON.
 *   **User-Flows**:
-    *   **Startseite → Ordnerbaum erscheint**: The UI (`index.html` and `app.js`) needs to implement the folder tree view.
+    *   **Startseite → Ordnerbaum erscheint**: The UI (`index.html` und `app.js`) needs to implement the folder tree view.
     *   **Drag-&-Drop Upload oder Dateidialog**: The UI needs to implement the drag-and-drop and file dialog for uploads.
     *   **Nach dem Upload: Thumbnail, Originalname (bearbeitbar), Öffentliche URL mit “Copy”-Button**: The UI needs to display these elements after upload.
     *   **Optionale Massen-Uploads wiederholen**: The UI needs this functionality.
@@ -44,6 +44,15 @@
 *   The `StorageService` in `services/storage.py` has a duplicate class definition that needs to be resolved.
 *   **Neue Upload-Logik implementiert**: Die automatische datumsbasierte Ordnererstellung wurde im Backend entfernt. Bilder werden nun direkt in den vom Frontend übermittelten Pfad hochgeladen.
 *   **"Folder path not provided" Fehler behoben**: Uploads in den Root-Ordner funktionieren jetzt korrekt.
+*   **Korrektur des Upload-Pfades für Unterordner**: Der `UploadManager` im Frontend wurde korrigiert, um den korrekten aktuellen Ordnerpfad an das Backend zu senden, wenn in Unterordner hochgeladen wird.
+*   **Debugging-Zeilen entfernt**: Alle temporären Debugging-Zeilen wurden aus dem Code entfernt.
+*   **Doppelter Upload behoben**: Der doppelte Event-Listener für den Upload-Button in `static/js/app.js` wurde entfernt, um zu verhindern, dass Dateien zweimal hochgeladen werden.
+*   **Doppelte Anzeige nach Upload behoben**: Der redundante Aufruf von `this.app.folderTree.loadFolderTree()` nach einem Upload wurde entfernt, um zu verhindern, dass Dateien zweimal in der Dateiliste angezeigt werden.
+*   **Automatisches Schließen von Modals**: Die Upload- und "New Folder"-Modals werden nach erfolgreicher Aktion automatisch geschlossen.
+*   **Verbesserung des Folder Trees**: Die CSS-Regeln in `static/css/custom.css` wurden aktualisiert, um eine modernere Darstellung des Folder Trees zu ermöglichen, und in `static/js/folder-tree-view.js` wurde ein Ordner-Icon hinzugefügt.
+*   **Bildvorschau-Korrekturen und Navigation**: Die `previewImage`-Methode in `static/js/preview-modal.js` wurde so angepasst, dass sie die relative URL für die Bildvorschau verwendet. Die Navigation zwischen Bildern im Preview-Modal (vorheriges/nächstes Bild) wurde implementiert, indem die Dateiliste und der aktuelle Index verfolgt werden und Event-Listener für Pfeiltasten und Navigationsbuttons hinzugefügt wurden (`static/js/app.js`, `static/js/preview-modal.js`, `templates/index.html`).
+*   **Folder Tree - "Add Subfolder" Button und Sichtbarkeit**: Der "Add Subfolder"-Button wurde in `static/js/folder-tree-view.js` wiederhergestellt. Die Sichtbarkeit der Buttons im Folder Tree wurde durch Anpassung der Farbe in `static/css/custom.css` verbessert.
+*   **Korrektur der Ordnererstellung und Auswahl des übergeordneten Ordners**: Die `addSubfolderAtPath`-Methode wurde in `static/js/file-management.js` hinzugefügt, um das "New Folder"-Modal korrekt mit dem übergeordneten Ordner vorauszufüllen.
 
 ## Known Issues
 *   Duplicate `StorageService` class definition in `services/storage.py`.

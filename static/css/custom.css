@@ -147,16 +147,17 @@
     font-weight: 500;
 }
 
+/* Folder Tree */
 .folder-tree {
     flex: 1;
     min-height: 150px;
-    max-height: 300px; /* Add max-height to control overall size */
+    max-height: 300px;
     overflow-y: auto;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background: var(--bg-secondary);
     position: relative;
-    padding: 8px 0; /* Add padding inside the tree container */
+    padding: 8px 0;
 }
 
 .folder-list {
@@ -166,170 +167,145 @@
 }
 
 .folder-item {
-    padding: 2px 4px; /* Adjust vertical padding for compactness */
-    cursor: pointer;
-    transition: background-color 0.1s ease; /* Smooth hover transition */
-    margin-bottom: 0;
-    font-size: 13px; /* Slightly larger font for readability */
-    color: var(--sidebar-text); /* Use primary sidebar text color */
-    display: flex;
-    flex-direction: column; /* Stack items vertically */
-    align-items: flex-start; /* Align items to the left */
-    justify-content: center; /* Center items vertically */
     position: relative;
-    user-select: none; /* Prevent text selection on click */
+    margin: 0; /* No margin between items */
 }
 
-.folder-item .folder-name {
-    flex: 1;
+.folder-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding-left: 0; /* Ensure no extra padding from previous rules */
-    font-weight: 500; /* Make folder names slightly bolder */
-    white-space: nowrap; /* Prevent text wrapping */
-    overflow: hidden; /* Hide overflow text */
-    text-overflow: ellipsis; /* Add ellipsis for overflow */
+    padding: 8px 16px;
+    height: 32px; /* Compact height */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--sidebar-text);
+    font-size: 14px;
+}
+
+.folder-header:hover {
+    background: var(--bg-tertiary);
+}
+
+.folder-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+}
+
+.folder-name .fas.fa-folder {
+    color: var(--accent-orange);
+    font-size: 14px;
 }
 
 .folder-actions {
     display: flex;
-    gap: 2px; /* Smaller gap between buttons */
-    opacity: 0; /* Hidden by default */
+    gap: 4px;
+    opacity: 0;
     transition: opacity 0.2s ease;
 }
 
-.folder-item:hover .folder-actions {
-    opacity: 1; /* Visible on folder item hover */
+.folder-item:hover .folder-actions,
+.folder-item.active .folder-actions {
+    opacity: 1;
 }
 
-.folder-action-btn {
-    width: 18px; /* Even more compact buttons */
-    height: 18px;
+.btn-action {
+    width: 24px;
+    height: 24px;
     border: none;
     background: transparent;
-    color: var(--text-muted); /* Subtle color by default */
-    border-radius: 3px; /* Slightly less rounded */
+    color: var(--text-secondary); /* Changed from text-muted to text-secondary for better contrast */
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background-color 0.1s ease, color 0.1s ease;
-    font-size: 9px; /* Even smaller icon size */
-    box-shadow: none;
+    font-size: 11px;
 }
 
-.folder-action-btn:hover {
-    background: var(--bg-tertiary); /* Subtle background on hover */
-    color: var(--text-primary); /* Darker text on hover */
+.btn-action:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
-.folder-action-btn.rename-folder-btn:hover {
+.btn-action.rename-folder-btn:hover {
     background: var(--accent-blue);
     color: white;
 }
 
-.folder-action-btn.delete-folder-btn:hover {
+.btn-action.delete-folder-btn:hover {
     background: var(--error-color);
     color: white;
 }
 
-.folder-tree-actions {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
+/* Indentation for nested folders */
+.folder-list .folder-item .folder-header {
+    padding-left: 32px; /* Base + 16px for first level */
 }
 
-.btn-tree-action {
-    flex: 1;
-    padding: 6px 8px;
-    font-size: 11px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
+.folder-list .folder-item .folder-item .folder-header {
+    padding-left: 48px; /* +16px for second level */
 }
 
-.btn-tree-action:hover {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border-color: var(--accent-blue);
+.folder-list .folder-item .folder-item .folder-item .folder-header {
+    padding-left: 64px; /* +16px for third level */
 }
 
-/* Remove last-child border as it's not needed with no individual borders */
-.folder-list > .folder-item:last-child {
-    border-bottom: none;
-}
-
-.folder-item:hover {
-    background: var(--bg-tertiary);
-    color: var(--sidebar-text);
-}
-
-/* Specific styling for nested folder items */
-.folder-list .folder-item {
-    padding-left: 12px; /* Base padding */
-    position: relative;
-    font-size: 13px; /* Consistent font size */
-}
-
-/* Specific styling for nested folder items */
-.folder-list .folder-item {
-    padding-left: 12px; /* Base padding for all items */
-}
-
-.folder-list .folder-list > .folder-item {
-    padding-left: 24px; /* Indent for first level sub-folders */
-}
-
-.folder-list .folder-list .folder-list > .folder-item {
-    padding-left: 36px; /* Indent for second level sub-folders */
-}
-
-.folder-list .folder-list .folder-list .folder-list > .folder-item {
-    padding-left: 48px; /* Indent for third level sub-folders */
-}
-
-/* Ensure the active state is also compact */
-.folder-item.active {
-    background: rgba(246, 173, 85, 0.1); /* Lighter background for active state */
+.folder-item.active .folder-header {
+    background: rgba(246, 173, 85, 0.1);
     color: var(--accent-orange);
     border-left: 3px solid var(--accent-orange);
+    padding-left: calc(16px - 3px); /* Adjust padding for border */
 }
 
-.folder-item.active .folder-name {
-    font-weight: 600; /* Bolder font for active item */
+/* Ensure active state indentation works for nested items */
+.folder-list .folder-item.active .folder-header {
+    padding-left: calc(32px - 3px);
 }
 
-.folder-list .folder-list > .folder-item {
-    padding-left: 24px; /* Indent for first level sub-folders */
+.folder-list .folder-item .folder-item.active .folder-header {
+    padding-left: calc(48px - 3px);
 }
 
-.folder-list .folder-list .folder-list > .folder-item {
-    padding-left: 36px; /* Indent for second level sub-folders */
+.folder-list .folder-item .folder-item .folder-item.active .folder-header {
+    padding-left: calc(64px - 3px);
 }
 
-.folder-list .folder-list .folder-list .folder-list > .folder-item {
-    padding-left: 48px; /* Indent for third level sub-folders */
+/* Vertical lines for hierarchy */
+.folder-item::before {
+    content: '';
+    position: absolute;
+    left: 24px; /* Position of the vertical line */
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--border-color); /* Color of the vertical line */
 }
 
-/* Style for the folder icon within the folder-name span */
-.folder-item .folder-name .fas.fa-folder {
-    color: var(--accent-orange); /* Folder icon color */
-    margin-right: 6px; /* Space between icon and text */
-    font-size: 12px; /* Small icon */
+.folder-item:last-child::before {
+    height: 16px; /* Only extend to the current item if it's the last child */
 }
 
-.folder-item.active {
-    background: linear-gradient(135deg, rgba(246, 173, 85, 0.1), rgba(255, 140, 66, 0.1));
-    color: var(--accent-orange);
-    border-left: 3px solid var(--accent-orange);
+.folder-item .folder-header::after {
+    content: '';
+    position: absolute;
+    left: 24px; /* Position of the horizontal line */
+    top: 16px;
+    width: 8px;
+    height: 1px;
+    background-color: var(--border-color); /* Color of the horizontal line */
+}
+
+/* Adjust lines for root items */
+.folder-list > .folder-item::before,
+.folder-list > .folder-item .folder-header::after {
+    display: none;
 }
 
 .view-toggle {
