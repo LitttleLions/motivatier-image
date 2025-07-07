@@ -11,12 +11,6 @@ logger = logging.getLogger(__name__)
 
 class StorageService:
     @staticmethod
-    def get_date_path():
-        """Generate date-based path (YYYY/MM/DD)"""
-        now = datetime.now()
-        return f"{now.year:04d}/{now.month:02d}/{now.day:02d}"
-    
-    @staticmethod
     def get_unique_filename(directory, filename):
         """Handle filename collisions by adding incrementing numbers"""
         if not os.path.exists(os.path.join(directory, filename)):
@@ -32,18 +26,22 @@ class StorageService:
     def save_file(file, folder_path=None, original_filename=None):
         """Save uploaded file with proper organization and create sidecar JSON"""
         try:
+            logger.info(f"StorageService.save_file: Received folder_path: '{folder_path}'")
             # Use provided folder or generate date-based path
-            if folder_path:
+            # Remove leading/trailing slashes and ensure it's safe
+            # If folder_path is '.' or empty, treat as UPLOAD_FOLDER root
+            if folder_path == '.' or folder_path == '':
+                full_dir = current_app.config['UPLOAD_FOLDER']
+                folder_path = '' # Normalize to empty string for consistent relative paths
+            else:
                 # Remove leading/trailing slashes and ensure it's safe
                 folder_path = folder_path.strip('/')
                 if '..' in folder_path or folder_path.startswith('/'):
                     raise ValueError("Invalid folder path")
-                date_path = folder_path
-            else:
-                date_path = StorageService.get_date_path()
+                
+                # Create full directory path
+                full_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], folder_path)
             
-            # Create full directory path
-            full_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], date_path)
             os.makedirs(full_dir, exist_ok=True)
             
             # Create thumbnails directory
@@ -65,7 +63,8 @@ class StorageService:
             file_stats = os.stat(file_path)
             
             # Generate public URL (this is the path relative to the UPLOAD_FOLDER)
-            public_url = os.path.join(date_path, unique_filename).replace('\\', '/')
+            # Use Path.joinpath for cleaner path concatenation, especially when folder_path is empty
+            public_url = str(Path(folder_path).joinpath(unique_filename)).replace('\\', '/')
             current_app.logger.info(f"StorageService.save_file public_url: {public_url}")
             
             # Create sidecar JSON file
@@ -89,7 +88,7 @@ class StorageService:
             
             return {
                 'url': public_url,
-                'path': os.path.join(date_path, unique_filename),
+                'path': str(Path(folder_path).joinpath(unique_filename)).replace('\\', '/'),
                 'name': unique_filename,
                 'size': file_stats.st_size,
                 'type': file.content_type,

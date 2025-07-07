@@ -6,7 +6,6 @@
 *   **API Blueprint (`api.py`)**: Provides endpoints for file upload, file listing, folder creation, deletion, and renaming.
 *   **File Storage (`storage.py`)**:
     *   Saves uploaded files to the filesystem.
-    *   Handles date-based folder creation (`YYYY/MM/DD`).
     *   Manages filename collisions by adding suffixes (e.g., `filename-1.jpg`).
     *   Lists files and directories.
     *   Creates, deletes, and renames folders.
@@ -18,6 +17,7 @@
     *   Loads environment variables for flexible configuration (`BASE_PATH`, `MAX_SIZE_MB`, `ALLOWED_TYPES`, etc.).
     *   Supports dynamic `APPLICATION_ROOT` for subdirectory deployments.
     *   Includes settings for CGI and Replit environments.
+*   **Root Folder Upload**: Files can now be uploaded directly to the root of the configured `UPLOAD_FOLDER`.
 
 ## What's Left to Build (Discrepancies/Missing Features based on PRD)
 *   **F-3 Metadaten ohne DB (Metadata without DB)**:
@@ -42,6 +42,8 @@
 *   Key functional requirements related to file-based metadata (`F-3`) and UI interactions (User-Flows, "Lovability") are either partially implemented or entirely missing.
 *   A significant bug exists where `api.py` calls `ThumbnailService.create_thumbnail` which is not the correct method name in `services/thumbs.py` (should be `process_uploaded_image`).
 *   The `StorageService` in `services/storage.py` has a duplicate class definition that needs to be resolved.
+*   **Neue Upload-Logik implementiert**: Die automatische datumsbasierte Ordnererstellung wurde im Backend entfernt. Bilder werden nun direkt in den vom Frontend übermittelten Pfad hochgeladen.
+*   **"Folder path not provided" Fehler behoben**: Uploads in den Root-Ordner funktionieren jetzt korrekt.
 
 ## Known Issues
 *   Duplicate `StorageService` class definition in `services/storage.py`.

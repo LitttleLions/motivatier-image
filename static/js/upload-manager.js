@@ -206,9 +206,14 @@ class UploadManager {
         }
 
         // Get selected folder - use custom input if visible, otherwise use select
-        const selectedFolder = folderInput.classList.contains('d-none') 
+        let selectedFolder = folderInput.classList.contains('d-none') 
             ? folderSelect.value 
             : folderInput.value.trim();
+
+        // If currentPath is empty (root folder), send '.' to the backend
+        if (selectedFolder === '') {
+            selectedFolder = '.';
+        }
 
         const progressContainer = document.getElementById('uploadProgress');
         const progressFill = document.getElementById('progressFill');
@@ -233,8 +238,9 @@ class UploadManager {
                 const formData = new FormData();
                 formData.append('file', file);
                 if (selectedFolder) {
-                    formData.append('folder', selectedFolder);
+                formData.append('folder', selectedFolder);
                 }
+                console.log('UploadManager: Sending folder to backend:', selectedFolder); // Debugging line
 
                 const result = await this.app.api.uploadFile(formData);
 
@@ -258,7 +264,7 @@ class UploadManager {
         if (completed > 0) {
             this.app.ui.showToast(`${this.app.t('uploadFilesSuccess')} ${completed} file(s)`, 'success');
             this.app.loadFolder(this.app.currentPath);
-            this.app.loadFolderTree();
+            this.app.folderTree.loadFolderTree(); // Corrected method call
 
             // Reset form immediately
             const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
