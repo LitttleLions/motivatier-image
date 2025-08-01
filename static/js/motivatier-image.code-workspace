@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "motivatier-image",
+			"path": "../../motivatier-image"
+		},
+		{
+			"name": "motivatier-image-1",
+			"path": "../../../motivatier-image-1"
+		}
+	],
+	"settings": {}
+}

@@ -1,28 +1,49 @@
 
-FROM python:3.11-slim
+# Stage 1: Builder - Installiert Abhängigkeiten und baut die Python-Pakete
+FROM python:3.11-slim AS builder
 
-# System-Updates und Abhängigkeiten
-RUN apt-get update && apt-get install -y \
+# System-Abhängigkeiten für den Build installieren
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libjpeg-dev \
     libpng-dev \
     libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Arbeitsverzeichnis erstellen
+# Arbeitsverzeichnis
 WORKDIR /app
 
-# Python-Abhängigkeiten kopieren und installieren
-COPY requirements.txt .
+# Pip aktualisieren
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Anforderungen installieren
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Stage 2: Final Image - Das eigentliche Laufzeit-Image
+FROM python:3.11-slim
+
+# Einen unprivilegierten Benutzer erstellen
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Arbeitsverzeichnis erstellen und Berechtigungen setzen
+WORKDIR /app
+
+# Notwendige Laufzeit-Abhängigkeiten installieren (z.B. für den Healthcheck)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installierte Pakete aus dem Builder-Stage kopieren
+COPY --from=builder /install /usr/local
 
 # App-Code kopieren
 COPY . .
 
-# Verzeichnisse erstellen
-RUN mkdir -p images logs static templates
-RUN chmod 755 images logs
+# Berechtigungen für den App-Benutzer setzen
+# Wichtig: Die Daten- und Log-Verzeichnisse sollten per Volume gemountet werden
+RUN chown -R appuser:appuser /app
+USER appuser
 
 # Port freigeben
 EXPOSE 5000
