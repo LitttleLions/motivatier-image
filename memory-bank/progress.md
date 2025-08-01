@@ -59,4 +59,4 @@
 *   The project started with a strong emphasis on a database-less approach, which is maintained in the current backend structure.
 *   The decision to use Flask with Blueprints and separate services has led to a modular and maintainable backend.
 *   The detailed PRD highlights several areas where the current implementation needs to be enhanced, especially regarding metadata handling and frontend user experience.
-*   **Deployment Strategy**: The user has chosen "Direct Python Application Deployment" on Plesk to leverage its built-in Git integration for automated updates and application restarts.
+*   **Deployment Strategy**: The deployment strategy has been simplified to a manual, yet robust, workflow using Plesk's integrated "Git" and "Docker" extensions, as the user currently lacks SSH access. The automated webhook approach has been abandoned in favor of a process that is fully controllable via the Plesk UI. The new workflow is: 1. Push to GitHub. 2. Pull changes in Plesk Git UI. 3. Rebuild container in Plesk Docker UI. All necessary configurations (`Dockerfile`, environment variables, Nginx reverse proxy rules) have been optimized for this workflow.
