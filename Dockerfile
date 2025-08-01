@@ -38,7 +38,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=builder /install /usr/local
 
 # App-Code kopieren
+# Wir kopieren alles außer den Dingen, die in .dockerignore stehen
 COPY . .
+
+# Stellen Sie sicher, dass das static-Verzeichnis kopiert wird (obwohl "COPY . ." dies tun sollte)
+COPY static /app/static
+COPY templates /app/templates
 
 # Berechtigungen für den App-Benutzer setzen
 # Wichtig: Die Daten- und Log-Verzeichnisse sollten per Volume gemountet werden
