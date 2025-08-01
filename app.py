@@ -28,34 +28,21 @@ def create_app():
     app.config.from_object(Config)
     app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
     
-    # Configure ProxyFix to trust headers from the reverse proxy
-    # x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1
-    # This will correctly handle URL generation when behind a proxy.
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
+    app.wsgi_app = ProxyFix(app.wsgi_app) # Keep ProxyFix but simplify parameters
 
-    # The APPLICATION_ROOT is now handled by ProxyFix via the X-Forwarded-Prefix header.
-    # We still read it from the environment for fallback or direct runs.
+    # The APPLICATION_ROOT will be set by Werkzeug/Gunicorn based on SCRIPT_NAME header from Nginx
     base_path = os.environ.get('APPLICATION_ROOT', '').rstrip('/')
     if base_path:
         app.config['APPLICATION_ROOT'] = base_path
-        # Explicitly set the static URL path to respect the APPLICATION_ROOT
-        app.static_url_path = f"{base_path}/static"
     
     app.logger.info(f"App initialized with APPLICATION_ROOT: {app.config.get('APPLICATION_ROOT')}")
-    app.logger.info(f"Static URL Path set to: {app.static_url_path}")
-
 
     from blueprints.api import api_bp
     from blueprints.ui import ui_bp
 
-    # Register blueprints. Flask will handle the APPLICATION_ROOT prefix automatically.
+    # Register blueprints. Werkzeug will use SCRIPT_NAME to calculate prefixes.
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(ui_bp, url_prefix='/')
-
-    # Add a simple root route for debugging
-    @app.route('/')
-    def index_route():
-        return "Flask App is running."
 
     return app
 
