@@ -27,6 +27,13 @@ class ImageStorageApp {
         this.fileManagement = new FileManagement(this); // Instantiate FileManagement
         this.uploadManager = new UploadManager(this); // Instantiate UploadManager
         this.previewModal = new PreviewModal(this); // Instantiate PreviewModal
+        
+        // Pass basePath to other modules
+        this.ui.basePath = this.basePath;
+        this.folderTree.basePath = this.basePath;
+        this.fileManagement.basePath = this.basePath;
+        this.uploadManager.basePath = this.basePath;
+        this.previewModal.basePath = this.basePath;
 
         this.init();
     }

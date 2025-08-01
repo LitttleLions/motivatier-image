@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Storage Service v1.1</title>
+    <title>Image Storage Service v1.5</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="./static/css/custom.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
     <script>window.BASE_PATH = "{{ config['APPLICATION_ROOT'] | default('') }}";</script>
 </head>
 <body class="modern-dark">
@@ -307,14 +307,10 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./static/js/app.js" type="module"></script>
-    <script src="./static/js/preview-modal.js" type="module"></script>
-    <script src="./static/js/upload-manager.js" type="module"></script>
-    <script src="./static/js/file-management.js" type="module"></script>
-    <script src="./static/js/folder-tree-view.js" type="module"></script>
-
-    <footer class="footer-version">
-        v1.1
-    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/preview-modal.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/upload-manager.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/file-management.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/folder-tree-view.js') }}" type="module"></script>
 </body>
 </html>
