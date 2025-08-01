@@ -2,7 +2,7 @@ import os
 import logging
 import sys # Import sys
 from logging.handlers import RotatingFileHandler
-from flask import Flask, request # Import request
+from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config
 
@@ -35,14 +35,9 @@ def create_app():
 
     # The APPLICATION_ROOT is now handled by ProxyFix via the X-Forwarded-Prefix header.
     # We still read it from the environment for fallback or direct runs.
-    # Explicitly set APPLICATION_ROOT based on X-Forwarded-Prefix
-    # This ensures Flask knows its base path for URL generation when behind a proxy.
-    @app.before_request
-    def set_application_root():
-        if 'X-Forwarded-Prefix' in request.headers:
-            app.config['APPLICATION_ROOT'] = request.headers['X-Forwarded-Prefix']
-        else:
-            app.config['APPLICATION_ROOT'] = os.environ.get('APPLICATION_ROOT', '').rstrip('/')
+    base_path = os.environ.get('APPLICATION_ROOT', '').rstrip('/')
+    if base_path:
+        app.config['APPLICATION_ROOT'] = base_path
     
     app.logger.info(f"App initialized with APPLICATION_ROOT: {app.config.get('APPLICATION_ROOT')}")
 

@@ -39,13 +39,13 @@ class ApiService {
     }
 
     async listFiles(path) {
-        const url = `/motivatier-image/api/list?path=${encodeURIComponent(path)}`;
+        const url = `${this.basePath}/api/list?path=${encodeURIComponent(path)}`;
         console.log('API: Listing files at', url);
         return this.fetchJson(url);
     }
 
     async uploadFile(formData) {
-        const url = `/motivatier-image/api/upload`;
+        const url = `${this.basePath}/api/upload`;
         console.log('API: Uploading file to', url);
         return this.fetchJson(url, {
             method: 'POST',
@@ -54,7 +54,7 @@ class ApiService {
     }
 
     async renameFile(filePath, newName) {
-        const url = `/motivatier-image/api/file/rename`;
+        const url = `${this.basePath}/api/file/rename`;
         console.log('API: Renaming file', filePath, 'to', newName);
         return this.fetchJson(url, {
             method: 'POST',
@@ -66,7 +66,7 @@ class ApiService {
     }
 
     async deleteFile(filePath) {
-        const url = `/motivatier-image/api/file`;
+        const url = `${this.basePath}/api/file`;
         console.log('API: Deleting file', filePath);
         return this.fetchJson(url, {
             method: 'DELETE',
@@ -78,7 +78,7 @@ class ApiService {
     }
 
     async createFolder(path) {
-        const url = `/motivatier-image/api/folder`;
+        const url = `${this.basePath}/api/folder`;
         console.log('API: Creating folder', path);
         return this.fetchJson(url, {
             method: 'POST',
@@ -90,7 +90,7 @@ class ApiService {
     }
 
     async deleteFolder(path) {
-        const url = `/motivatier-image/api/folder`;
+        const url = `${this.basePath}/api/folder`;
         console.log('API: Deleting folder', path);
         return this.fetchJson(url, {
             method: 'DELETE',
@@ -102,7 +102,7 @@ class ApiService {
     }
 
     async renameFolder(oldPath, newPath) {
-        const url = `/motivatier-image/api/folder/rename`;
+        const url = `${this.basePath}/api/folder/rename`;
         console.log('API: Renaming folder', oldPath, 'to', newPath);
         return this.fetchJson(url, {
             method: 'POST',
