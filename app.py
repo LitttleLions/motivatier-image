@@ -38,8 +38,12 @@ def create_app():
     base_path = os.environ.get('APPLICATION_ROOT', '').rstrip('/')
     if base_path:
         app.config['APPLICATION_ROOT'] = base_path
+        # Explicitly set the static URL path to respect the APPLICATION_ROOT
+        app.static_url_path = f"{base_path}/static"
     
     app.logger.info(f"App initialized with APPLICATION_ROOT: {app.config.get('APPLICATION_ROOT')}")
+    app.logger.info(f"Static URL Path set to: {app.static_url_path}")
+
 
     from blueprints.api import api_bp
     from blueprints.ui import ui_bp
