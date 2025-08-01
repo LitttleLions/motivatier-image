@@ -52,6 +52,11 @@ def create_app():
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(ui_bp, url_prefix='/')
 
+    # Add a simple root route for debugging
+    @app.route('/')
+    def index_route():
+        return "Flask App is running."
+
     return app
 
 app = create_app()
